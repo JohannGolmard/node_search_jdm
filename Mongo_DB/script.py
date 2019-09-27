@@ -63,7 +63,7 @@ else:
 		driver = webdriver.Firefox(options=options)
 		mot = sys.argv[1]
 		# rel=0 pour éviter des phrases et des string bizarre (ex : a64efbf7283dfc58db2cf20f1b78216b)
-		site = "http://www.jeuxdemots.org/rezo-dump.php?gotermsubmit=Chercher&gotermrel=chat&rel=?gotermsubmit=Chercher&gotermrel="+mot+"&rel=0"
+		site = "http://www.jeuxdemots.org/rezo-dump.php?gotermsubmit=Chercher&gotermrel="+mot+"&rel=0"
 		s = requests.Session()
 		requete(site,sitedown(site))
 	except:
