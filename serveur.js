@@ -119,8 +119,9 @@ function ramif(mot, motAlreadyGet){
 function getRamification(mot, callback){
 	let motAlreadyGet = new Array();
 	let mot_tempo= "'"+mot+"'";
+	let promises = [];
 	motAlreadyGet.push(mot_tempo);
-	let rez =ramif(mot, motAlreadyGet);
+	let rez = ramif(mot, motAlreadyGet);
 	console.log("qsdsqdsqdsq")
 	return rez;
 }
@@ -168,6 +169,7 @@ MongoClient.connect(url, {useNewUrlParser: true , useUnifiedTopology: true}, (er
 			//on requête JDM et on l'ajoute à la BDD + renvoi du tout
 			if(documents.length == 0){
 				http.get('http://www.jeuxdemots.org/rezo-dump.php?gotermsubmit=Chercher&gotermrel='+mot+'&rel='+numRela+'', (resp) => {
+  					resp.setEncoding('latin1');
   					let data = '';
 
 					// A chunk of data has been recieved.
@@ -180,15 +182,20 @@ MongoClient.connect(url, {useNewUrlParser: true , useUnifiedTopology: true}, (er
 						const $ = htmlParser.load(data);
 						data=$('code').text();
 						let dataClear = clearData(data)
-						let ramification = getRamification(mot, (ramification)=>{
+    					db.collection("requetes").insertOne({"mot":mot,"numRela":numRela,"definition":"TO DO","data":dataClear,"date":date,"nb_access":1},(err,documents)=>{
+							res.setHeader("Content-type", "application/json");
+    						res.end(JSON.stringify(documents['ops'][0])); //pour éviter de récupérer le tableau mais juste les info
+						});
+
+						/*let ramification = getRamification(mot, (ramification)=>{
 								res.setHeader("Content-type", "application/json");
 		    					res.end(JSON.stringify(ramification));
 		    					/*db.collection("requetes").insertOne({"mot":mot,"numRela":numRela,"definition":ramification,"data":dataClear,"date":date,"nb_access":1},(err,documents)=>{
 									res.setHeader("Content-type", "application/json");
 		    						res.end(JSON.stringify(documents['ops'][0])); //pour éviter de récupérer le tableau mais juste les info
-								});*/
+								});
 
-						});
+						});*/
 					});
 
 					}).on("error", (err) => {
