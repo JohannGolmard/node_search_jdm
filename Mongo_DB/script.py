@@ -17,7 +17,7 @@ def sitedown(url):
 		print('status_code : ', r.status_code)
 	else:
 		driver.get(url)
-		return BeautifulSoup(driver.page_source, 'html.parser') 
+		return BeautifulSoup(driver.page_source, 'html.parser')
 
 
 def requete(url, reponse):
@@ -62,7 +62,7 @@ else:
 		options.add_argument('--headless')
 		driver = webdriver.Firefox(options=options)
 		mot = sys.argv[1]
-		# rel=0 pour éviter des phrases et des string bizarre (ex : a64efbf7283dfc58db2cf20f1b78216b)
+		# rel=0 pour éviter des phrases et des string bizarre 
 		site = "http://www.jeuxdemots.org/rezo-dump.php?gotermsubmit=Chercher&gotermrel="+mot+"&rel=0"
 		s = requests.Session()
 		requete(site,sitedown(site))

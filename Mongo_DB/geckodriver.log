@@ -817,3 +817,5 @@ JavaScript warning: http://www.jeuxdemots.org/jsscripts/mootools.js, line 545: A
 JavaScript warning: http://www.jeuxdemots.org/jsscripts/mootools.js, line 328: Array.forEach is deprecated; use Array.prototype.forEach instead
 JavaScript warning: http://www.jeuxdemots.org/jsscripts/mootools.js, line 545: Array.slice is deprecated; use Array.prototype.slice instead
 1569596666340	Marionette	INFO	Stopped listening on port 33823
+1570785528106	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "--headless" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofile.rhdsvGEPok8f"
+*** You are running in headless mode.
