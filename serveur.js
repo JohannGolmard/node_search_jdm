@@ -61,24 +61,69 @@ MongoClient.connect(url, {useNewUrlParser: true , useUnifiedTopology: true}, (er
 	});
 
 
-
+	// séparé avec des virgules
 	app.get("/requetes/:mot/:arrayRela", (req, res)=>{
 		let mot = req.params.mot;
 		let tempo = req.params.arrayRela.split(',');
 		let rela = tempo.map(function (x) {
   			return parseInt(x, 10);
 		});
-		console.log(rela);
-		res.setHeader("Content-type", "application/json");
-		res.end(JSON.stringify(rela));
+
+		var promises = [];
+		for(let rez in rela){
+			let numRela = rela[rez];
+			promises.push(new Promise((resolve, reject) => {
+				db.collection("requetes").find({"mot":mot, "numRela":numRela}).toArray((err,documents)=>{
+					let dateObject = new Date();
+					let date = dateObject.getDate()+"/"+(dateObject.getMonth()+1)+"/"+dateObject.getFullYear();
+					//on requête JDM et on l'ajoute à la BDD + renvoi du tout
+					if(documents.length == 0){
+						http.get('http://www.jeuxdemots.org/rezo-dump.php?gotermsubmit=Chercher&gotermrel='+mot+'&rel='+numRela+'', (resp) => {
+		  					resp.setEncoding('latin1');
+		  					let data = '';
+
+							// A chunk of data has been recieved.
+							resp.on('data', (chunk) => {
+								data += chunk;
+							});
+
+							// The whole response has been received. Print out the result.
+							resp.on('end', () => {
+								const $ = htmlParser.load(data);
+								data=$('code').text();
+								let dataClear = clearData(data)
+								db.collection("requetes").insertOne({"mot":mot,"numRela":numRela,"data":dataClear,"date":date,"nb_access":1},(err,documents)=>{
+											resolve(JSON.stringify(documents['ops'][0]));
+								});
+							});
+
+							}).on("error", (err) => {
+							  console.log("Error lors de l'ajout d'un mot à la BDD : " + err.message);
+						});
+					}else{ // mets à jour la date et le nbAccess
+						db.collection("requetes").findOneAndUpdate({"mot":mot, "numRela":numRela},{$set: {"nb_access":documents[0].nb_access+1, "date":date}},{returnOriginal: false}, (err,documents)=>{
+								resolve(JSON.stringify(documents['value']));
+						});
+
+					}
+				})
+    	}));
+		};
+
+		Promise.all(promises).then((rez) =>
+    	{
+						console.log(rez);
+						res.setHeader("Content-type", "application/json");
+						res.end(JSON.stringify(rez));
+			}
+		);
 	})
 
-	// Définition si elle y est tant mieux sinon avec les rafinements (relation 4 )
 	app.get("/requete/:mot/:numRela",(req,res)=>{
 		let mot = req.params.mot;
 		let numRela = parseInt(req.params.numRela);
 		let dateObject = new Date();
-		let date = dateObject.getDate()+"/"+(dateObject.getMonth()+1)+"/"+dateObject.getFullYear()
+		let date = dateObject.getDate()+"/"+(dateObject.getMonth()+1)+"/"+dateObject.getFullYear();
 		db.collection("requetes").find({"mot":mot, "numRela":numRela}).toArray((err,documents)=>{
 			//on requête JDM et on l'ajoute à la BDD + renvoi du tout
 			if(documents.length == 0){
