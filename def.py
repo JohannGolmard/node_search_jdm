@@ -45,7 +45,11 @@ def getRamification(mot):
 	url = "http://www.jeuxdemots.org/rezo-dump.php?gotermsubmit=Chercher&gotermrel="+urllib.parse.quote_plus(mot, encoding='cp1252')+"&rel=1";
 	data = requests.get(url);
 	data = BeautifulSoup(data.text, 'html.parser')
-	definition = str(data.find("def").text);
+	definition = "";
+	if data.find("def").text is None :
+		definition = "";
+	else :
+		definition = str(data.find("def").text);
 	data = str(data.find("code"));
 	data = data.replace("&gt;",">");
 	dataClear = getMotRelationEntrante(data,mot);
