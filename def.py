@@ -46,10 +46,10 @@ def getRamification(mot):
 	data = requests.get(url);
 	data = BeautifulSoup(data.text, 'html.parser')
 	definition = "";
-	if data.find("def").text is None :
-		definition = "";
-	else :
+	try :
 		definition = str(data.find("def").text);
+	except AttributeError :
+		definion = "";
 	data = str(data.find("code"));
 	data = data.replace("&gt;",">");
 	dataClear = getMotRelationEntrante(data,mot);
