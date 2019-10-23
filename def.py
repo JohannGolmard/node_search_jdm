@@ -55,9 +55,9 @@ def getRamification(mot):
 	dataClear = getMotRelationEntrante(data,mot);
 	poidCurrentMot = dataClear.pop();
 	if len(dataClear) == 0 :
-		rez = {"mot": mot,"definion" : definition, "poid" : int(poidCurrentMot)};
+		rez = {"mot": mot,"definition" : definition, "poid" : int(poidCurrentMot)};
 		return rez;
-	rez = {"mot": mot,"definion" : definition, "poid" : int(poidCurrentMot), "ramification": []};
+	rez = {"mot": mot,"definition" : definition, "poid" : int(poidCurrentMot), "ramification": []};
 	for motAParcourir in dataClear:
 		motCourant = motAParcourir.split(";");
 		if len(motCourant)== 6 :
