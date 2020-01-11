@@ -160,10 +160,49 @@ MongoClient.connect(url, {useNewUrlParser: true , useUnifiedTopology: true}, (er
 		});
 	});
 
-	// test def
+
 	app.get("/def/:mot",(req,res)=>{
 		let mot = req.params.mot;
-		let numRela = parseInt(req.params.numRela);
+		let numRela = 1;
+		let dateObject = new Date();
+		let date = dateObject.getDate()+"/"+(dateObject.getMonth()+1)+"/"+dateObject.getFullYear()
+		db.collection("definition").find({"mot":mot}).toArray((err,documents)=>{
+			//on requête JDM et on l'ajoute à la BDD + renvoi du tout
+			if(documents.length == 0){
+				http.get('http://www.jeuxdemots.org/rezo-dump.php?gotermsubmit=Chercher&gotermrel='+mot+'&rel='+numRela+'', (resp) => {
+						resp.setEncoding('latin1');
+						let data = '';
+
+					// A chunk of data has been recieved.
+					resp.on('data', (chunk) => {
+						data += chunk;
+					});
+
+					// The whole response has been received. Print out the result.
+					resp.on('end', () => {
+						const $ = htmlParser.load(data);
+						data=$('code').text();
+						let dataClear = clearData(data);
+						let definition =$('def').text();
+						db.collection("definition").insertOne({"mot":mot,"definition":definition,"numRela":numRela,"ramification":dataClear},(err,documents)=>{
+									res.setHeader("Content-type", "application/json");
+									res.end(JSON.stringify(documents['ops']));
+						});
+					});
+
+					}).on("error", (err) => {
+						console.log("Error lors de l'ajout d'un mot à la BDD : " + err.message);
+				});
+			}else{ // mets à jour la date et le nbAccess
+				res.setHeader("Content-type", "application/json");
+				res.end(JSON.stringify(documents));
+			}
+		});
+	});
+
+	// test ramification
+	app.get("/ramification/:mot",(req,res)=>{
+		let mot = req.params.mot;
 		let dateObject = new Date();
 		let date = dateObject.getDate()+"/"+(dateObject.getMonth()+1)+"/"+dateObject.getFullYear()
 		db.collection("definition").find({"mot":mot}).toArray((err,documents)=>{
@@ -172,7 +211,7 @@ MongoClient.connect(url, {useNewUrlParser: true , useUnifiedTopology: true}, (er
 					getRamification(mot, (ramification)=>{
     					db.collection("definition").insertOne(ramification,(err,documents)=>{
 								res.setHeader("Content-type", "application/json");
-    						res.end(JSON.stringify(documents['ops'][0])); //pour éviter de récupérer le tableau mais juste les info
+    						res.end(JSON.stringify(documents['ops'])); 
 							});
 					});
 			}else{ // mets à jour la date et le nbAccess
