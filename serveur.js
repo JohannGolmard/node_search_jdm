@@ -211,7 +211,7 @@ MongoClient.connect(url, {useNewUrlParser: true , useUnifiedTopology: true}, (er
 					getRamification(mot, (ramification)=>{
     					db.collection("definition").insertOne(ramification,(err,documents)=>{
 								res.setHeader("Content-type", "application/json");
-    						res.end(JSON.stringify(documents['ops'])); 
+    						res.end(JSON.stringify(documents['ops']));
 							});
 					});
 			}else{ // mets à jour la date et le nbAccess
@@ -221,6 +221,10 @@ MongoClient.connect(url, {useNewUrlParser: true , useUnifiedTopology: true}, (er
 		});
 	});
 
+});
+app.use(express.static(path.join(__dirname,"dist/search-jdm")));
+app.get("*",function(req,res){
+	res.sendFile(path.join(__dirname,"dist/search-jdm/index.html"));
 });
 app.listen(8888);
 console.log("Everything is ok !");
