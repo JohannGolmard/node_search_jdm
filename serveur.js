@@ -51,6 +51,23 @@ MongoClient.connect(url, {useNewUrlParser: true , useUnifiedTopology: true}, (er
 		});
 	});
 
+	app.post("/addMots",(req,res)=>{
+		let mot = req.body['mot'];
+		try {
+				db.collection("mots").find({"mot":mot}).toArray((err,documents)=>{
+					if(documents.length!=0){
+		    		res.end(JSON.stringify('Membre existe déjà !'));
+		    	}
+		    	else{
+		    	  db.collection("mots").insertOne(req.body);
+				    res.end(JSON.stringify("Inscription réussie"));
+		    	}
+				});
+		} catch(e) {
+	  	console.log(e);
+	  }
+	});
+
 	// sort tous mots suivant le mot passé en paramètre (^mot%) dans l'ordre décroissant du poid
 	app.get("/completion/:mot",(req,res)=>{
 		let mot = req.params.mot;
@@ -227,4 +244,5 @@ app.get("*",function(req,res){
 	res.sendFile(path.join(__dirname,"dist/search-jdm/index.html"));
 });
 app.listen(8888);
+app.listen(8888, "0.0.0.0");
 console.log("Everything is ok !");
