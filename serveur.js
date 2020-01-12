@@ -51,6 +51,23 @@ MongoClient.connect(url, {useNewUrlParser: true , useUnifiedTopology: true}, (er
 		});
 	});
 
+	app.post("/addMots",(req,res)=>{
+		let mot = req.body['mot'];
+		try {
+				db.collection("mots").find({"mot":mot}).toArray((err,documents)=>{
+					if(documents.length!=0){
+		    		res.end(JSON.stringify('Membre existe déjà !'));
+		    	}
+		    	else{
+		    	  db.collection("mots").insertOne(req.body);
+				    res.end(JSON.stringify("Inscription réussie"));
+		    	}
+				});
+		} catch(e) {
+	  	console.log(e);
+	  }
+	});
+
 	// sort tous mots suivant le mot passé en paramètre (^mot%) dans l'ordre décroissant du poid
 	app.get("/completion/:mot",(req,res)=>{
 		let mot = req.params.mot;
@@ -211,7 +228,7 @@ MongoClient.connect(url, {useNewUrlParser: true , useUnifiedTopology: true}, (er
 					getRamification(mot, (ramification)=>{
     					db.collection("definition").insertOne(ramification,(err,documents)=>{
 								res.setHeader("Content-type", "application/json");
-    						res.end(JSON.stringify(documents['ops'])); 
+    						res.end(JSON.stringify(documents['ops']));
 							});
 					});
 			}else{ // mets à jour la date et le nbAccess
@@ -223,4 +240,5 @@ MongoClient.connect(url, {useNewUrlParser: true , useUnifiedTopology: true}, (er
 
 });
 app.listen(8888);
+app.listen(8888, "0.0.0.0");
 console.log("Everything is ok !");
