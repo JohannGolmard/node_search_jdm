@@ -243,6 +243,10 @@ MongoClient.connect(url, {useNewUrlParser: true , useUnifiedTopology: true}, (er
 	});
 
 });
-app.listen(8888);
+//app.use(express.static(path.join(__dirname,"dist/search-jdm")));
+//app.get("*",function(req,res){
+//	res.sendFile(path.join(__dirname,"dist/search-jdm/index.html"));
+//});
+//app.listen(8888);
 app.listen(8888, "0.0.0.0");
 console.log("Everything is ok !");
