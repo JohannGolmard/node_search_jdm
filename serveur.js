@@ -23,6 +23,10 @@ function clearData(data){
 	return rez;
 }
 
+function escapeRegExp(string) {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
+}
+
 function getRamification(mot, callback){
 	//On appel le script python !
 	const ls = spawn('python3', ['def.py', mot]);
@@ -71,7 +75,7 @@ MongoClient.connect(url, {useNewUrlParser: true , useUnifiedTopology: true}, (er
 	// sort tous mots suivant le mot passé en paramètre (^mot%) dans l'ordre décroissant du poid
 	app.get("/completion/:mot",(req,res)=>{
 		let mot = req.params.mot;
-		db.collection("mots").find({"mot":new RegExp('^'+mot,'i')}).sort({ poid: -1 }).toArray((err,documents)=>{
+		db.collection("mots").find({"mot":new RegExp('^'+escapeRegExp(mot),'i')}).sort({ poid: -1 }).toArray((err,documents)=>{
 			res.setHeader("Content-type", "application/json");
 		    res.end(JSON.stringify(documents));
 		});
